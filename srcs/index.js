@@ -2,6 +2,7 @@ const Axios = require('axios').default;
 const fs = require('fs');
 const path = require('path');
 const sanitize = require("sanitize-filename");
+const yargs = require('yargs');
 
 async function authentificate() {
     const axios = Axios.create({
@@ -24,8 +25,8 @@ async function authentificate() {
     return { axios, user: {...user, ...keys} };
 }
 
+let outdir = "./downloads";
 async function downloadFile(downloadUrl, name) {
-    const outdir = "./downloads";
     const downloadPath = path.join(outdir, name);
     const stream = fs.createWriteStream(downloadPath);
     Axios.get(downloadUrl, {
@@ -67,7 +68,7 @@ function parseUserUrl(userUrl) {
     return found[1];
 }
 
-async function main(userUrl) {
+async function run(userUrl) {
     const userId = parseUserUrl(userUrl);
     if (!userId) {
         return console.error(`Invalid user url: ${userUrl}`);
@@ -92,4 +93,25 @@ async function main(userUrl) {
     }
 }
 
-main('https://medal.tv/users/3658396');
+async function main(userUrl) {
+    const args = yargs
+        .usage('Usage: $0 -u [userUrl]')
+        .option('userUrl', {
+            description: 'The medal user url',
+            alias: 'u',
+            require: true,
+        })
+        .option('downloadDir', {
+            description: 'Directory for downloaded video',
+            default: './downloads',
+            alias: 'd'
+        })
+        .help()
+        .alias('help', 'h')
+        .argv
+    outdir = args.downloadDir;
+    await run(args.userUrl);
+}
+
+// url = 'https://medal.tv/users/3658396'
+main();
