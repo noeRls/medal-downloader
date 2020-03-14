@@ -3,12 +3,16 @@
   "version": "1.0.0",
   "description": "Download all user medal videos",
   "main": "srcs/index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/noeRls/medal-downloader.git"
+  },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node srcs/index.js"
   },
   "author": "Noe Rivals",
-  "license": "ISC",
+  "license": "MIT",
   "dependencies": {
     "axios": "^0.19.2",
     "joi": "^14.3.1",

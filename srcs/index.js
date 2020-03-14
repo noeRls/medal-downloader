@@ -93,7 +93,7 @@ async function run(userUrl) {
     }
 }
 
-async function main(userUrl) {
+async function main() {
     const args = yargs
         .usage('Usage: $0 -u [userUrl]')
         .option('userUrl', {
