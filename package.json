@@ -2,16 +2,15 @@
   "name": "medal-downloader",
   "version": "1.0.0",
   "description": "Download all user medal videos",
-  "main": "index.js",
+  "main": "srcs/index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "node srcs/index.js"
   },
   "author": "Noe Rivals",
   "license": "ISC",
   "dependencies": {
     "axios": "^0.19.2",
-    "jssoup": "0.0.10",
-    "simplecrawler": "^1.1.8",
-    "x-ray": "^2.3.4"
+    "joi": "^14.3.1"
   }
 }
