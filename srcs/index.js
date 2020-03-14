@@ -1,6 +1,7 @@
 const Axios = require('axios').default;
 const fs = require('fs');
 const path = require('path');
+const sanitize = require("sanitize-filename");
 
 async function authentificate() {
     const axios = Axios.create({
@@ -47,7 +48,7 @@ async function download(video) {
         return;
     }
     const downloadUrl = video[`contentUrl${bestQuality}p`];
-    const videoName = `${video.contentTitle}.mp4`;
+    const videoName = `${sanitize(video.contentTitle)}.mp4`;
 
     console.log(`Starting download: ${bestQuality}p - "${videoName}"`)
     try {
