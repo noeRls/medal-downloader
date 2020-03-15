@@ -19,7 +19,7 @@ async function downloadFile(downloadUrl, name) {
 
   const stream = fs.createWriteStream(downloadPath);
 
-  const progressBar = new ProgressBar(`-> ${name} [:bar] :percent :etas`, {
+  const progressBar = new ProgressBar(`[:bar] :percent :etas -> ${name}`, {
     width: 40,
     complete: '=',
     incomplete: ' ',
