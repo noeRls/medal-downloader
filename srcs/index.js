@@ -153,3 +153,5 @@ async function main() {
 
 // url = 'https://medal.tv/users/3658396'
 main();
+
+module.exports = main;

@@ -1,2 +1,11 @@
 # medal-downloader
-Download all your public medal video
+
+Download all your [medal](https://medal.tv/) videos
+
+## Installation
+
+Incoming
+
+## Usage
+
+Incoming
