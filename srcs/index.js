@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const Axios = require('axios').default;
 const fs = require('fs');
 const path = require('path');
@@ -103,7 +105,7 @@ async function run(userUrl, username, password) {
   try {
     const user = await api.getUser(userId);
     console.log(`${user.displayName} have ${user.submissions} public videos`);
-    const videos = await api.listVideos(userId, 30);
+    const videos = await api.listVideos(userId);
     console.log(`${videos.length} videos downloadable`);
     await downloadAll(videos, 1);
   } catch (e) {
@@ -153,5 +155,3 @@ async function main() {
 
 // url = 'https://medal.tv/users/3658396'
 main();
-
-module.exports = main;
