@@ -9,7 +9,7 @@ const ProgressBar = require('progress');
 const Api = require('./Api');
 
 let outdir = './downloads';
-async function downloadFile(downloadUrl, name) {
+async function downloadFile(downloadUrl, name, video) {
   const { data, headers } = await Axios({
     url: downloadUrl,
     method: 'GET',
@@ -17,7 +17,11 @@ async function downloadFile(downloadUrl, name) {
   });
   const totalLength = Number(headers['content-length']);
 
-  const downloadPath = path.join(outdir, name);
+  const downloadDir = path.join(outdir, video.poster.displayName);
+  if (!fs.existsSync(downloadDir)) {
+    fs.mkdirSync(downloadDir);
+  }
+  const downloadPath = path.join(downloadDir, name);
   if (fs.existsSync(downloadPath)) {
     const stats = fs.statSync(downloadPath);
     if (stats.size === totalLength) {
@@ -56,7 +60,7 @@ async function download(video) {
   const videoName = `${sanitize(video.contentTitle)}.mp4`;
 
   try {
-    await downloadFile(downloadUrl, videoName);
+    await downloadFile(downloadUrl, videoName, video);
   } catch (e) {
     console.error(e);
     console.log(`Failed to download: "${videoName}"`);
@@ -104,7 +108,7 @@ async function run(userUrl, username, password) {
 
   try {
     const user = await api.getUser(userId);
-    console.log(`${user.displayName} have ${user.submissions} public videos`);
+    console.log(`${user.displayName} have ${user.submissions} videos`);
     const videos = await api.listVideos(userId);
     console.log(`${videos.length} videos downloadable`);
     await downloadAll(videos, 1);
@@ -128,7 +132,7 @@ async function main() {
     })
     .check(argv => {
       if (!fs.existsSync(argv.downloadDir)) {
-        throw new Error(`Error: download directory "${argv.downloadDir}" doesn't exists`);
+        fs.mkdirSync(argv.downloadDir);
       }
       return true;
     })
