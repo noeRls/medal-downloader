@@ -21,10 +21,12 @@ jobs:
 
   deploy:
     runs-on: ubuntu-latest
-    needs: test
+    needs: tests
     if: github.ref == 'refs/heads/master'
     steps:
       - name: Install dependencies
         run: npm install --only=prod
       - name: Publish on npm
-        run: exit 0
+        run: npm publish public
+        env:
+          NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
