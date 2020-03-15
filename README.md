@@ -17,7 +17,7 @@ npm install -g medal-downloader
 
 ## Usage
 
-### public videos
+### Public videos
 
 > You can use the --help option to get more details about the commands and their options
 
