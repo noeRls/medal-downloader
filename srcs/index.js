@@ -8,8 +8,6 @@ const Api = require('./Api');
 
 let outdir = './downloads';
 async function downloadFile(downloadUrl, name) {
-  const downloadPath = path.join(outdir, name);
-
   const { data, headers } = await Axios({
     url: downloadUrl,
     method: 'GET',
@@ -17,6 +15,14 @@ async function downloadFile(downloadUrl, name) {
   });
   const totalLength = Number(headers['content-length']);
 
+  const downloadPath = path.join(outdir, name);
+  if (fs.existsSync(downloadPath)) {
+    const stats = fs.statSync(downloadPath);
+    if (stats.size === totalLength) {
+      console.log(`${name} -> already downloaded, skipping`);
+      return;
+    }
+  }
   const stream = fs.createWriteStream(downloadPath);
 
   const progressBar = new ProgressBar(`[:bar] :percent :etas -> ${name}`, {
@@ -30,6 +36,7 @@ async function downloadFile(downloadUrl, name) {
   data.on('data', chunk => progressBar.tick(chunk.length));
   data.pipe(stream);
 
+  // eslint-disable-next-line consistent-return
   return new Promise((res, rej) => {
     stream.on('finish', res);
     stream.on('error', rej);
