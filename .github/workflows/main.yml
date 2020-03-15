@@ -24,6 +24,10 @@ jobs:
     needs: tests
     if: github.ref == 'refs/heads/master'
     steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: 12
       - name: Install dependencies
         run: npm install --only=prod
       - name: Publish on npm
