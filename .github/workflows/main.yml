@@ -31,6 +31,6 @@ jobs:
       - name: Install dependencies
         run: npm install --only=prod
       - name: Publish on npm
-        run: npm publish public
+        run: npm publish
         env:
           NODE_AUTH_TOKEN: ${{secrets.NPM_TOKEN}}
