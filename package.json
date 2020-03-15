@@ -9,14 +9,22 @@
   },
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "start": "node srcs/index.js"
+    "start": "node srcs/index.js",
+    "lint": "eslint srcs/ --ext .js"
   },
   "author": "Noe Rivals",
   "license": "MIT",
   "dependencies": {
     "axios": "^0.19.2",
+    "eslint": "^6.8.0",
+    "eslint-config-airbnb": "^18.1.0",
     "joi": "^14.3.1",
     "sanitize-filename": "^1.6.3",
     "yargs": "^15.3.0"
+  },
+  "devDependencies": {
+    "eslint-plugin-import": "^2.20.1",
+    "eslint-plugin-jsx-a11y": "^6.2.3",
+    "eslint-plugin-react": "^7.19.0"
   }
 }
