@@ -42,7 +42,24 @@ async function download(video) {
     }
 }
 
-async function run(userUrl, username, password) {
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+async function downloadAll(videos, maxSimultaneous) {
+    let current = 0;
+    await Promise.all(videos.map(async d => {
+        try {
+            while (current >= maxSimultaneous) await sleep(100);
+            current += 1
+            await download(d)
+        } catch (e) {
+        }
+        current -= 1;
+    }));
+}
+
+async function run(userUrl, username, password, maxSimultaneous) {
     const userId = Api.parseUserUrl(userUrl);
     if (!userId) {
         return console.error(`Invalid user url: ${userUrl}`);
@@ -61,14 +78,9 @@ async function run(userUrl, username, password) {
     try {
         const user = await api.getUser(userId)
         console.log(`${user.displayName} have ${user.submissions} public videos`);
-        const videos = await api.listVideos(userId, 2);
+        const videos = await api.listVideos(userId);
         console.log(`${videos.length} videos downloadable`);
-        await Promise.all(videos.map(async d => {
-            try {
-                await download(d)
-            } catch (e) {
-            }
-        }));
+        await downloadAll(videos, maxSimultaneous);
     } catch (e) {
         console.error(e);
         console.error('An error occured');
@@ -93,6 +105,10 @@ async function main() {
             }
             return true;
         })
+        .option('maxSimultaneous', {
+            describe: 'Specify the maximum number of simulaneous download',
+            default: 10
+        })
         .option('username', {
             describe: 'Username of the user account',
             required: false
@@ -111,7 +127,7 @@ async function main() {
         .alias('help', 'h')
         .argv
     outdir = args.downloadDir;
-    return await run(args.url, args.username, args.password);
+    return await run(args.url, args.username, args.password, args.maxSimultaneous);
 }
 
 // url = 'https://medal.tv/users/3658396'
