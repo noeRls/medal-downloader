@@ -3,27 +3,7 @@ const fs = require('fs');
 const path = require('path');
 const sanitize = require("sanitize-filename");
 const yargs = require('yargs');
-
-async function authentificate() {
-    const axios = Axios.create({
-        withCredentials: true
-    });
-    const password = 'superstrongpassword';
-    const { data: user } = await axios.post('https://api-v2.medal.tv/users', {
-        email: 'guest',
-        password,
-        userName: 'guest',
-    });
-    const { data: keys } = await axios.post('https://api-v2.medal.tv/authentication', {
-        password,
-        userName: user.displayName,
-    });
-    axios.interceptors.request.use(config => {
-        config.headers['x-authentication'] = `${user.userId},${keys.key}`;
-        return config;
-    })
-    return { axios, user: {...user, ...keys} };
-}
+const Api = require('./Api');
 
 let outdir = "./downloads";
 async function downloadFile(downloadUrl, name) {
@@ -62,26 +42,28 @@ async function download(video) {
     }
 }
 
-function parseUserUrl(userUrl) {
-    const found = userUrl.match(/\/users\/([0-9]+(\/|$))/);
-    if (!found) return null;
-    return found[1];
-}
-
-async function run(userUrl) {
-    const userId = parseUserUrl(userUrl);
+async function run(userUrl, username, password) {
+    const userId = Api.parseUserUrl(userUrl);
     if (!userId) {
         return console.error(`Invalid user url: ${userUrl}`);
     }
     console.log(`User id: ${userId}`)
+
+    const api = new Api();
+
     try {
-        const { axios } = await authentificate();
-        const userUrl = `https://api-v2.medal.tv/users/${userId}`;
-        const { data: user } = await axios.get(userUrl);
+        if (username && password) await api.authentificate(username, password);
+        else await api.guestAuthentificate();
+    } catch (e) {
+        return console.error('Authentification failed');
+    }
+
+    try {
+        const user = await api.getUser(userId)
         console.log(`${user.displayName} have ${user.submissions} public videos`);
-        const { data } = await axios.get(`https://api-v2.medal.tv/content?userId=${userId}&limit=2`);
-        console.log(`${data.length} videos downloadable`);
-        await Promise.all(data.map(async d => {
+        const videos = await api.listVideos(userId, 2);
+        console.log(`${videos.length} videos downloadable`);
+        await Promise.all(videos.map(async d => {
             try {
                 await download(d)
             } catch (e) {
@@ -95,22 +77,41 @@ async function run(userUrl) {
 
 async function main() {
     const args = yargs
-        .usage('Usage: $0 -u [userUrl]')
-        .option('userUrl', {
+        .usage('Usage: $0 --url [userUrl]')
+        .option('url', {
             description: 'The medal user url',
-            alias: 'u',
-            require: true,
+            required: true,
         })
         .option('downloadDir', {
             description: 'Directory for downloaded video',
             default: './downloads',
             alias: 'd'
         })
+        .check(argv => {
+            if (!fs.existsSync(argv.downloadDir)) {
+                throw new Error(`Error: download directory "${argv.downloadDir}" doesn't exists`);
+            }
+            return true;
+        })
+        .option('username', {
+            describe: 'Username of the user account',
+            required: false
+        })
+        .option('password', {
+            describe: 'Password of the user account',
+            required: false
+        })
+        .check(argv => {
+            if ((argv.username || argv.password) && !(argv.username && argv.password)) {
+                throw new Error('Error: provide username AND password or nothing');
+            }
+            return true;
+        })
         .help()
         .alias('help', 'h')
         .argv
     outdir = args.downloadDir;
-    await run(args.userUrl);
+    return await run(args.url, args.username, args.password);
 }
 
 // url = 'https://medal.tv/users/3658396'
