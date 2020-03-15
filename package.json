@@ -7,6 +7,7 @@
     "type": "git",
     "url": "https://github.com/noeRls/medal-downloader.git"
   },
+  "keywords": ["medal","download","backup","record","cli","medaltv","clip","videos"],
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node srcs/index.js",
