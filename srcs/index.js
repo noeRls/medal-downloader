@@ -3,17 +3,32 @@ const fs = require('fs');
 const path = require('path');
 const sanitize = require('sanitize-filename');
 const yargs = require('yargs');
+const ProgressBar = require('progress');
 const Api = require('./Api');
 
 let outdir = './downloads';
 async function downloadFile(downloadUrl, name) {
   const downloadPath = path.join(outdir, name);
-  const stream = fs.createWriteStream(downloadPath);
-  Axios.get(downloadUrl, {
+
+  const { data, headers } = await Axios({
+    url: downloadUrl,
+    method: 'GET',
     responseType: 'stream',
-  }).then(res => {
-    res.data.pipe(stream);
   });
+  const totalLength = Number(headers['content-length']);
+
+  const stream = fs.createWriteStream(downloadPath);
+
+  const progressBar = new ProgressBar(`-> ${name} [:bar] :percent :etas`, {
+    width: 40,
+    complete: '=',
+    incomplete: ' ',
+    renderThrottle: 1,
+    total: totalLength,
+  });
+
+  data.on('data', chunk => progressBar.tick(chunk.length));
+  data.pipe(stream);
 
   return new Promise((res, rej) => {
     stream.on('finish', res);
@@ -31,10 +46,8 @@ async function download(video) {
   const downloadUrl = video[`contentUrl${bestQuality}p`];
   const videoName = `${sanitize(video.contentTitle)}.mp4`;
 
-  console.log(`Starting download: ${bestQuality}p - "${videoName}"`);
   try {
     await downloadFile(downloadUrl, videoName);
-    console.log(`Downloaded: ${bestQuality}p - "${videoName}"`);
   } catch (e) {
     console.error(e);
     console.log(`Failed to download: "${videoName}"`);
@@ -61,7 +74,7 @@ async function downloadAll(videos, maxSimultaneous) {
   }));
 }
 
-async function run(userUrl, username, password, maxSimultaneous) {
+async function run(userUrl, username, password) {
   const userId = Api.parseUserUrl(userUrl);
   if (!userId) {
     console.error(`Invalid user url: ${userUrl}`);
@@ -83,9 +96,9 @@ async function run(userUrl, username, password, maxSimultaneous) {
   try {
     const user = await api.getUser(userId);
     console.log(`${user.displayName} have ${user.submissions} public videos`);
-    const videos = await api.listVideos(userId, 5);
+    const videos = await api.listVideos(userId, 30);
     console.log(`${videos.length} videos downloadable`);
-    await downloadAll(videos, maxSimultaneous);
+    await downloadAll(videos, 1);
   } catch (e) {
     console.error(e);
     console.error('An error occured');
@@ -110,10 +123,6 @@ async function main() {
       }
       return true;
     })
-    .option('maxSimultaneous', {
-      describe: 'Specify the maximum number of simulaneous download',
-      default: 10,
-    })
     .option('username', {
       describe: 'Username of the user account',
       required: false,
@@ -132,7 +141,7 @@ async function main() {
     .alias('help', 'h')
     .argv;
   outdir = args.downloadDir;
-  await run(args.url, args.username, args.password, args.maxSimultaneous);
+  await run(args.url, args.username, args.password);
 }
 
 // url = 'https://medal.tv/users/3658396'
