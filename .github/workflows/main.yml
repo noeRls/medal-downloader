@@ -30,11 +30,7 @@ jobs:
           node-version: 12
       - name: Install dependencies
         run: npm install --only=prod
-      - name: Debug whoami
-        run: npm whoami
-        env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
       - name: Publish on npm
         run: npm publish
         env:
-          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
