@@ -35,7 +35,7 @@ async function downloadFile(downloadUrl, name, video) {
     width: 40,
     complete: '=',
     incomplete: ' ',
-    renderThrottle: 1,
+    renderThrottle: 16,
     total: totalLength,
   });
 
