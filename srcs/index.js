@@ -24,7 +24,7 @@ async function downloadFile(downloadUrl, name, video) {
   const downloadPath = path.join(downloadDir, name);
   if (fs.existsSync(downloadPath)) {
     const stats = fs.statSync(downloadPath);
-    if (stats.size === totalLength) {
+    if (stats.size >= totalLength) {
       console.log(`${name} -> already downloaded, skipping`);
       return;
     }
