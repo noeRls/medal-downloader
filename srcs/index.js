@@ -87,22 +87,37 @@ async function downloadAll(videos, maxSimultaneous) {
   }));
 }
 
-async function run(userUrl, username, password) {
-  const userId = Api.parseUserUrl(userUrl);
-  if (!userId) {
-    console.error(`Invalid user url: ${userUrl}`);
-    return;
+async function loadUserId(api, userUrl, username) {
+  let userId = null;
+  if (userUrl) {
+    userId = await api.loadUserIdFromUrl(userUrl);
+    if (!userId) {
+      console.error(`Invalid user url: ${userUrl}`);
+    }
+  } else if (username) {
+    userId = await api.loadUserIdFromUsername(username);
+    if (!userId) {
+      console.error(`Invalid username: ${username}`);
+    }
+  } else {
+    console.error('Missing required argument: --username or --url required');
   }
-  console.log(`User id: ${userId}`);
+  return userId;
+}
 
+async function run(userUrl, username, password) {
   const api = new Api();
-
   try {
     if (username && password) await api.authentificate(username, password);
     else await api.guestAuthentificate();
   } catch (e) {
     console.error(e);
     console.error('Authentification failed');
+    return;
+  }
+
+  const userId = await loadUserId(api, userUrl, username);
+  if (!userId) {
     return;
   }
 
@@ -120,10 +135,10 @@ async function run(userUrl, username, password) {
 
 async function main() {
   const args = yargs
-    .usage('Usage: $0 --url [userUrl]')
+    .usage('Usage: $0 --username [username]')
     .option('url', {
       description: 'The medal user url',
-      required: true,
+      required: false,
     })
     .option('downloadDir', {
       description: 'Directory for downloaded video',
@@ -145,8 +160,8 @@ async function main() {
       required: false,
     })
     .check(argv => {
-      if ((argv.username || argv.password) && !(argv.username && argv.password)) {
-        throw new Error('Error: provide username AND password or nothing');
+      if (!argv.username && !argv.url) {
+        throw new Error('Missing required argument: username or url');
       }
       return true;
     })

@@ -5,7 +5,6 @@ class Api {
     this.axios = Axios.create({
       withCredentials: true,
     });
-    this.parseUserUrl = this.constructor.parseUserUrl;
   }
 
   async authentificate(username, password) {
@@ -57,10 +56,29 @@ class Api {
     return objs;
   }
 
-  static parseUserUrl(userUrl) {
-    const found = userUrl.match(/\/users\/([0-9]+(\/|$))/);
-    if (!found) return null;
-    return found[1];
+  async loadUserIdFromUsername(username) {
+    try {
+      const { data } = await this.axios.get(`https://medal.tv/u/${username}`);
+      const userIdInResponse = /"userId":"([0-9]+)/gm.exec(data);
+      if (userIdInResponse) {
+        return userIdInResponse[1];
+      }
+    } catch (e) {
+      console.error(e);
+    }
+    return null;
+  }
+
+  async loadUserIdFromUrl(userUrl) {
+    const userIdInUrl = userUrl.match(/\/users\/([0-9]+(\/|$))/);
+    if (userIdInUrl && userIdInUrl[1]) {
+      return userIdInUrl[1];
+    }
+    const usernameInUrl = userUrl.match(/\/u\/(.+)/);
+    if (usernameInUrl && usernameInUrl[1]) {
+      return this.loadUserIdFromUsername(usernameInUrl[1]);
+    }
+    return null;
   }
 }
 

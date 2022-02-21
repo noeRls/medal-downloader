@@ -19,7 +19,14 @@ npm install -g medal-downloader
 
 ### Public videos
 
-> You can use the --help option to get more details about the commands and their options
+**With username**
+
+```bash
+medal-downloader --username [username]
+```
+
+**With profile url**
+
 
 ```bash
 medal-downloader --url [userurl]
@@ -32,5 +39,18 @@ The medal user url is the url of the profile page on the website.
 To download your unlisted videos you must provide your username and password this way:
 
 ```bash
-medal-downloader --url [userurl] --password [password] --username [username]
+medal-downloader --password [password] --username [username]
+```
+### Help
+
+```
+Usage: medal-downloader --username [username]
+
+Options:
+  --version          Show version number                               [boolean]
+  --url              The medal user url
+  --downloadDir, -d  Directory for downloaded video     [default: "./downloads"]
+  --username         Username of the user account
+  --password         Password of the user account
+  --help, -h         Show help                                         [boolean]
 ```
