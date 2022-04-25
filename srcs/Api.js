@@ -39,16 +39,22 @@ class Api {
     return user;
   }
 
-  async listVideos(userId, max = null) {
+  async listVideos(userId, max = null, categoryId) {
     let objs = [];
     let data = null;
     let offset = 0;
+    let category = categoryId ? `&categoryId=${categoryId}` : "";
     const maxPerRequest = 1000;
     // eslint-disable-next-line no-constant-condition
     while (true) {
       const limit = max ? Math.min(max - offset, maxPerRequest) : maxPerRequest;
       // eslint-disable-next-line no-await-in-loop
-      data = (await this.axios.get(`https://api-v2.medal.tv/content?userId=${userId}&limit=${limit}&offset=${offset}`)).data;
+      data = (
+          await this.axios.get(
+              `https://api-v2.medal.tv/content?userId=${userId}${category}&limit=${limit}&offset=${offset}`
+          )
+      ).data;
+
       objs = [...objs, ...data];
       offset += data.length;
       if (data.length === 0 || data.length < limit || limit < maxPerRequest) { break; }
