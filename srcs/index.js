@@ -49,6 +49,14 @@ async function downloadFile(downloadUrl, name, video) {
   });
 }
 
+const getVideoName = (video) => {
+  let name = sanitize(video.contentTitle);
+  if (!video.contentTitle || video.contentTitle === 'Untitled') {
+    name += `-${video.contentId}`;
+  }
+  return `${name}.mp4`;
+};
+
 async function download(video) {
   const quality = ['1080', '720', '480', '360', '240', '144'];
   const bestQuality = quality.find(q => video[`contentUrl${q}p`]);
@@ -57,8 +65,8 @@ async function download(video) {
     return;
   }
   const downloadUrl = video[`contentUrl${bestQuality}p`];
-  const videoName = `${sanitize(video.contentTitle)}.mp4`;
 
+  const videoName = getVideoName(video);
   try {
     await downloadFile(downloadUrl, videoName, video);
   } catch (e) {
