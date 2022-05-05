@@ -1,6 +1,6 @@
 {
   "name": "medal-downloader",
-  "version": "1.1.0",
+  "version": "1.2.0",
   "description": "Download all user medal videos",
   "main": "srcs/index.js",
   "repository": {
