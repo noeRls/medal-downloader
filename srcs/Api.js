@@ -39,7 +39,7 @@ class Api {
     return user;
   }
 
-  async listVideos(userId, max = null, categoryId) {
+  async listVideos(userId, max = null, categoryId = null) {
     let objs = [];
     let data = null;
     let offset = 0;
