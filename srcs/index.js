@@ -166,9 +166,9 @@ async function main() {
       return true;
     })
     .option('categoryId', {
-        describe:
+      describe:
             'Category Id of a game (https://api-v2.medal.tv/categories)',
-        required: false,
+      required: false,
     })
     .help()
     .alias('help', 'h')
