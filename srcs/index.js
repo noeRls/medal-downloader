@@ -105,7 +105,7 @@ async function loadUserId(api, userUrl, username) {
   return userId;
 }
 
-async function run(userUrl, username, password) {
+async function run(userUrl, username, password, categoryId) {
   const api = new Api();
   try {
     if (username && password) await api.authentificate(username, password);
@@ -124,7 +124,7 @@ async function run(userUrl, username, password) {
   try {
     const user = await api.getUser(userId);
     console.log(`${user.displayName} have ${user.submissions} videos`);
-    const videos = await api.listVideos(userId);
+    const videos = await api.listVideos(userId, null, categoryId);
     console.log(`${videos.length} videos downloadable`);
     await downloadAll(videos, 1);
   } catch (e) {
@@ -165,11 +165,16 @@ async function main() {
       }
       return true;
     })
+    .option('categoryId', {
+        describe:
+            'Category Id of a game (https://api-v2.medal.tv/categories)',
+        required: false,
+    })
     .help()
     .alias('help', 'h')
     .argv;
   outdir = args.downloadDir;
-  await run(args.url, args.username, args.password);
+  await run(args.url, args.username, args.password, args.categoryId);
 }
 
 // url = 'https://medal.tv/users/3658396'
