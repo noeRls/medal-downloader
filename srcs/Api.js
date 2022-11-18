@@ -62,9 +62,13 @@ class Api {
     return objs;
   }
 
-  async loadUserIdFromUsername(username) {
+  async loadUserIdFromUsername(username, password) {
     try {
-      const { data } = await this.axios.get(`https://medal.tv/u/${username}`);
+      const url = "https://medal.tv/u/" + username
+      const { data } = await this.axios.post(url, {
+            userName: username,
+            password: password
+      });
       const userIdInResponse = /"userId":"([0-9]+)/gm.exec(data);
       if (userIdInResponse) {
         return userIdInResponse[1];

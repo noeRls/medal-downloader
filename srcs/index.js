@@ -95,7 +95,7 @@ async function downloadAll(videos, maxSimultaneous) {
   }));
 }
 
-async function loadUserId(api, userUrl, username) {
+async function loadUserId(api, userUrl, username, password) {
   let userId = null;
   if (userUrl) {
     userId = await api.loadUserIdFromUrl(userUrl);
@@ -103,7 +103,7 @@ async function loadUserId(api, userUrl, username) {
       console.error(`Invalid user url: ${userUrl}`);
     }
   } else if (username) {
-    userId = await api.loadUserIdFromUsername(username);
+    userId = await api.loadUserIdFromUsername(username, password);
     if (!userId) {
       console.error(`Invalid username: ${username}`);
     }
@@ -124,7 +124,7 @@ async function run(userUrl, username, password, categoryId) {
     return;
   }
 
-  const userId = await loadUserId(api, userUrl, username);
+  const userId = await loadUserId(api, userUrl, username, password);
   if (!userId) {
     return;
   }
