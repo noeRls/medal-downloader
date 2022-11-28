@@ -64,14 +64,14 @@ class Api {
 
   async loadUserIdFromUsername(username, password) {
     try {
-      const url = "https://medal.tv/u/" + username
+      const url = "https://api-v2.medal.tv/authentication"
       const { data } = await this.axios.post(url, {
             userName: username,
             password: password
       });
-      const userIdInResponse = /"userId":"([0-9]+)/gm.exec(data);
+      const userIdInResponse = data.userId
       if (userIdInResponse) {
-        return userIdInResponse[1];
+        return userIdInResponse;
       }
     } catch (e) {
       console.error(e);
