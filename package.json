@@ -20,7 +20,8 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "node srcs/index.js",
-    "lint": "eslint srcs/ --ext .js"
+    "lint": "eslint srcs/ --ext .js",
+    "lint:fix": "eslint srcs/ --fix --ext .js"
   },
   "author": "Noe Rivals",
   "license": "MIT",

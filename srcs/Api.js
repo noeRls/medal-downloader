@@ -64,11 +64,12 @@ class Api {
 
   async loadUserIdFromUsername(username) {
     try {
-      const { data } = await this.axios.get(`https://medal.tv/u/${username}`);
-      const userIdInResponse = /"userId":"([0-9]+)/gm.exec(data);
-      if (userIdInResponse) {
-        return userIdInResponse[1];
+      const { data } = await this.axios.get(`https://medal.tv/api/users?username=${username}`);
+      if (data.length === 0) {
+        console.error(`No user found for '${username}'`);
+        return null;
       }
+      return data[0].userId;
     } catch (e) {
       console.error(e);
     }
